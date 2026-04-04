@@ -2,12 +2,19 @@ const todoModel = require("../models/todomodel")
 
 const getTodos = async (req,res)=>{
  try{
-    console.log("GET TODOS CALISTI");
-  const todos = await todoModel.getTodos()
+  console.log("GET TODOS CALISTI");
+
+  const todos = await todoModel.getTodos();
+
   console.log("DB'den veri geldi");
-  res.json(todos)
+
+  res.json(todos);
+
  }catch(err){
-  console.error(err)
+  console.error(err);
+
+  // ✅ BUNU EKLE
+  res.status(500).json({ error: "Server error" });
  }
 }
 
