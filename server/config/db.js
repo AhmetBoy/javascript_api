@@ -18,5 +18,8 @@ const pool = new Pool({
     rejectUnauthorized: false
   }
 });
+pool.connect()
+  .then(() => console.log("DB CONNECTED"))
+  .catch(err => console.error("DB CONNECTION ERROR:", err));
 
 module.exports = pool;
