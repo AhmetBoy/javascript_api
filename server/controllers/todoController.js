@@ -1,4 +1,4 @@
-const todoModel = require("../models/todoModel")
+const todoModel = require("../models/todomodel")
 
 const getTodos = async (req,res)=>{
  try{
