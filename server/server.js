@@ -16,8 +16,11 @@ app.get("/", (req, res) => {
 });
 
 app.use("/",todoRoutes)
+pool.connect()
+  .then(() => console.log("DB CONNECTED server.js"))
+  .catch(err => console.error("DB CONNECTION ERROR: server.js", err));
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT,()=>{
     console.log(`Server started on port ${PORT}`);
 })
