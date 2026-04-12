@@ -13,27 +13,47 @@ function Home() {
   }, []);
 
   const fetchTodos = async () => {
-    const data = await getTodos();
-    setTodos(data);
+    try {
+      const data = await getTodos();
+      if(Array.isArray(data)) setTodos(data);
+    } catch (error) {
+      console.error(error);
+      alert("Görevler yüklenirken bir hata oluştu.");
+    }
   };
 
   const handleAdd = async () => {
     if (!input) return;
-    await addTodo(input);
-    setInput("");
-    fetchTodos();
+    try {
+      await addTodo(input);
+      setInput("");
+      fetchTodos();
+    } catch (error) {
+      console.error(error);
+      alert("Görev eklenirken bir hata oluştu.");
+    }
   };
 
   const handleDelete = async (id) => {
-    await deleteTodo(id);
-    fetchTodos();
+    try {
+      await deleteTodo(id);
+      fetchTodos();
+    } catch (error) {
+      console.error(error);
+      alert("Görev silinirken bir hata oluştu.");
+    }
   };
 
   const handleUpdate = async (id) => {
     const newTask = prompt("Yeni görev gir");
     if (!newTask) return;
-    await updateTodo(id, newTask);
-    fetchTodos();
+    try {
+      await updateTodo(id, newTask);
+      fetchTodos();
+    } catch (error) {
+      console.error(error);
+      alert("Görev güncellenirken bir hata oluştu.");
+    }
   };
 
   return (

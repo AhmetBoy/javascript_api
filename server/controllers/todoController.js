@@ -43,7 +43,8 @@ const deleteTodo = async (req,res)=>{
   await todoModel.deleteTodo(id)
   res.json({message:"Todo silindi"})
  }catch(err){
-  console.error(err)
+  console.error(err);
+  res.status(500).json({ error: "Server error" });
  }
 }
 
@@ -54,7 +55,8 @@ const updateTodo = async (req,res)=>{
   const todo = await todoModel.updateTodo(id, title)
   res.json(todo)
  }catch(err){
-  console.error(err)
+  console.error(err);
+  res.status(500).json({ error: "Server error" });
  }
 }
 
