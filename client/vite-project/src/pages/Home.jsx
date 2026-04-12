@@ -3,56 +3,94 @@ import { getTodos, addTodo, deleteTodo, updateTodo } from "../services/api";
 
 import AddTodo from "../components/AddTodo";
 import TodoList from "../components/TodoList";
+import SkeletonLoader from "../components/SkeletonLoader";
 
 function Home() {
   const [todos, setTodos] = useState([]);
   const [input, setInput] = useState("");
 
+  // Loading & Optimistic UI states
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [isAdding, setIsAdding] = useState(false);
+  const [errorShake, setErrorShake] = useState(false);
+
   useEffect(() => {
-    fetchTodos();
+    let mounted = true;
+    const loadData = async () => {
+      try {
+        const data = await getTodos();
+        if (mounted && Array.isArray(data)) setTodos(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        if (mounted) setIsInitialLoad(false);
+      }
+    };
+    loadData();
+    return () => { mounted = false; };
   }, []);
 
-  const fetchTodos = async () => {
-    try {
-      const data = await getTodos();
-      if(Array.isArray(data)) setTodos(data);
-    } catch (error) {
-      console.error(error);
-      alert("Görevler yüklenirken bir hata oluştu.");
-    }
-  };
+  const triggerError = () => {
+    setErrorShake(true);
+    setTimeout(() => setErrorShake(false), 400);
+  }
 
   const handleAdd = async () => {
-    if (!input) return;
+    if (!input.trim()) return;
+    const taskText = input;
+
+    // 1. Optimistic Update
+    const tempId = Date.now();
+    const tempTodo = { id: tempId, title: taskText, isTemp: true };
+    setTodos((prev) => [...prev, tempTodo]);
+    setInput("");
+    setIsAdding(true);
+
+    // 2. Perform Request
     try {
-      await addTodo(input);
-      setInput("");
-      fetchTodos();
+      const addedTodo = await addTodo(taskText);
+      // Swap temp with real immediately
+      setTodos((prev) => prev.map((t) => (t.id === tempId ? addedTodo : t)));
     } catch (error) {
       console.error(error);
-      alert("Görev eklenirken bir hata oluştu.");
+      triggerError();
+      // Rollback
+      setTodos((prev) => prev.filter((t) => t.id !== tempId));
+      setInput(taskText); // Restore input softly
+    } finally {
+      setIsAdding(false);
     }
   };
 
   const handleDelete = async (id) => {
+    // 1. Optimistic Delete
+    const previousTodos = [...todos];
+    setTodos((prev) => prev.filter((t) => t.id !== id));
+
+    // 2. Perform Request
     try {
       await deleteTodo(id);
-      fetchTodos();
     } catch (error) {
       console.error(error);
-      alert("Görev silinirken bir hata oluştu.");
+      triggerError();
+      // Rollback
+      setTodos(previousTodos);
     }
   };
 
-  const handleUpdate = async (id) => {
-    const newTask = prompt("Yeni görev gir");
-    if (!newTask) return;
+  const handleUpdate = async (id, newTitle) => {
+    // 1. Optimistic Edit
+    const previousTodos = [...todos];
+    setTodos((prev) => prev.map((t) => t.id === id ? { ...t, title: newTitle } : t));
+
+    // 2. Perform Request
     try {
-      await updateTodo(id, newTask);
-      fetchTodos();
+      await updateTodo(id, newTitle);
     } catch (error) {
       console.error(error);
-      alert("Görev güncellenirken bir hata oluştu.");
+      triggerError();
+      // Rollback
+      setTodos(previousTodos);
     }
   };
 
@@ -66,13 +104,21 @@ function Home() {
         input={input}
         setInput={setInput}
         onAdd={handleAdd}
+        isAdding={isAdding}
+        errorShake={errorShake}
       />
 
-      <TodoList
-        todos={todos}
-        onDelete={handleDelete}
-        onUpdate={handleUpdate}
-      />
+      <div className="min-h-[200px]">
+        {isInitialLoad ? (
+          <SkeletonLoader />
+        ) : (
+          <TodoList
+            todos={todos}
+            onDelete={handleDelete}
+            onUpdate={handleUpdate}
+          />
+        )}
+      </div>
     </div>
   );
 }
