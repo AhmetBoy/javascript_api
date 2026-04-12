@@ -7,13 +7,18 @@ const getTodos = async () => {
  return result.rows
 }
 
-const createTodo = async (task) => {
- const result = await pool.query(
-  "INSERT INTO todos(task) VALUES($1) RETURNING *",
-  [task]
- )
- return result.rows[0]
-}
+const createTodo = async (title) => {
+try {
+    const result = await pool.query(
+    'INSERT INTO todos(title, completed) VALUES($1, $2) RETURNING *',
+    [title, false]
+    )
+    console.log("DB'ye yeni todo eklendi:", result.rows[0]);
+    return result.rows[0]
+    }catch(err){
+        console.error("Todo oluşturulurken hata oluştu:", err);
+        throw err; // Hata yönetimi için hatayı tekrar fırlat
+    }}
 
 const deleteTodo = async (id) => {
  await pool.query(
@@ -22,10 +27,10 @@ const deleteTodo = async (id) => {
  )
 }
 
-const updateTodo = async (id, task) => {
+const updateTodo = async (id, title) => {
  const result = await pool.query(
-  "UPDATE todos SET task=$1 WHERE id=$2 RETURNING *",
-  [task, id]
+  "UPDATE todos SET title=$1 WHERE id=$2 RETURNING *",
+  [title, id]
  )
  return result.rows[0]
 }

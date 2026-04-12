@@ -19,13 +19,22 @@ const getTodos = async (req,res)=>{
 }
 
 const createTodo = async (req,res)=>{
- try{
-  const task = req.body.task
-  const todo = await todoModel.createTodo(task)
-  res.json(todo)
- }catch(err){
-  console.error(err)
- }
+  console.log("CREATE CALISTI");
+  console.log("BODY:", req.body);
+
+  try{
+    const title = req.body.title;
+
+    const todo = await todoModel.createTodo(title);
+
+    console.log("SQL CALISTI");
+
+    res.json(todo);
+
+  }catch(err){
+    console.error("HATA:", err);
+    res.status(500).json({ error: "Server error" });
+  }
 }
 
 const deleteTodo = async (req,res)=>{
@@ -41,8 +50,8 @@ const deleteTodo = async (req,res)=>{
 const updateTodo = async (req,res)=>{
  try{
   const id = req.params.id
-  const task = req.body.task
-  const todo = await todoModel.updateTodo(id,task)
+  const title = req.body.title
+  const todo = await todoModel.updateTodo(id, title)
   res.json(todo)
  }catch(err){
   console.error(err)

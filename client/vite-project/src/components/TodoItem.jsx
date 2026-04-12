@@ -1,7 +1,7 @@
 function TodoItem({ todo, onDelete, onUpdate }) {
   return (
     <li className="flex justify-between items-center border p-2 rounded mb-2">
-      <span>{todo.task}</span>
+      <span>{todo.title}</span>
 
       <div className="flex gap-2">
         <button
