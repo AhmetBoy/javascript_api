@@ -50,10 +50,11 @@ const deleteTodo = async (req,res)=>{
 
 const updateTodo = async (req,res)=>{
  try{
-  const id = req.params.id
-  const title = req.body.title
-  const todo = await todoModel.updateTodo(id, title)
-  res.json(todo)
+  const id = req.params.id;
+  const title = req.body.title;
+  const completed = req.body.completed;
+  const todo = await todoModel.updateTodo(id, title, completed);
+  res.json(todo);
  }catch(err){
   console.error(err);
   res.status(500).json({ error: "Server error" });

@@ -27,10 +27,10 @@ const deleteTodo = async (id) => {
  )
 }
 
-const updateTodo = async (id, title) => {
+const updateTodo = async (id, title, completed) => {
  const result = await pool.query(
-  "UPDATE todos SET title=$1 WHERE id=$2 RETURNING *",
-  [title, id]
+  "UPDATE todos SET title=$1, completed=$2 WHERE id=$3 RETURNING *",
+  [title, completed, id]
  )
  return result.rows[0]
 }

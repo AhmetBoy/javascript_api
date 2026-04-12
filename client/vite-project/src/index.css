@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* opsiyonel: default body ayarı */
 body {
-  @apply bg-gray-900 text-white min-h-screen;
+  @apply bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300;
 }

@@ -28,13 +28,13 @@ export const deleteTodo = async (id) => {
 };
 
 // UPDATE
-export const updateTodo = async (id, title) => {
+export const updateTodo = async (id, title, completed) => {
   const res = await fetch(`${API_URL}/todos/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ title }),
+    body: JSON.stringify({ title, completed }),
   });
 
   return res.json();
